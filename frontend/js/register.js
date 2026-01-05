@@ -7,7 +7,7 @@ function renderRegisterResult(user, isError = false) {
 
   return `
     <div class="success-box">
-      <div class="success-header">✅ Karyawan berhasil didaftarkan!</div>
+      <div class="success-header">Karyawan berhasil didaftarkan!</div>
       <div class="profile-card">
         <div class="profile-header">
           <div class="profile-avatar">${user.name ? user.name.charAt(0).toUpperCase() : 'U'}</div>

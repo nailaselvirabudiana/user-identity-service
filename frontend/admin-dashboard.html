@@ -15,7 +15,7 @@
 <div class="dashboard-container">
   <div class="dashboard-header">
     <h2>Employee Management</h2>
-    <a href="add-employee.html" class="btn-primary">➕ Tambah Karyawan</a>
+    <a href="add-employee.html" class="btn-primary">+ Tambah Karyawan</a>
   </div>
   
   <!-- Tabs -->
@@ -27,7 +27,7 @@
   <!-- Filters -->
   <div class="filters">
     <div class="search-box">
-      <span class="search-icon">🔍</span>
+      <span class="search-icon"></span>
       <input type="text" id="searchInput" placeholder="Search by name, email, or ID">
     </div>
     
@@ -65,7 +65,7 @@
       <tbody id="employeeTableBody">
         <tr>
           <td colspan="6" class="loading-cell">
-            <div class="loading">🔄 Memuat data karyawan...</div>
+            <div class="loading">Memuat data karyawan...</div>
           </td>
         </tr>
       </tbody>
@@ -76,9 +76,9 @@
   <div class="pagination">
     <div id="recordInfo">Showing 0 of 0</div>
     <div class="pagination-controls">
-      <button id="prevPage" onclick="changePage(-1)" disabled>← Previous</button>
+      <button id="prevPage" onclick="changePage(-1)" disabled>Previous</button>
       <span id="pageInfo">Page 1 of 1</span>
-      <button id="nextPage" onclick="changePage(1)" disabled>Next →</button>
+      <button id="nextPage" onclick="changePage(1)" disabled>Next</button>
     </div>
   </div>
 </div>
@@ -107,7 +107,7 @@ async function loadEmployees() {
   const users = await api('/users', 'GET');
   
   if (!users || users.message || !Array.isArray(users)) {
-    tbody.innerHTML = `<tr><td colspan="6" class="error-cell">❌ ${users?.message || 'Gagal memuat data'}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" class="error-cell">${users?.message || 'Gagal memuat data'}</td></tr>`;
     return;
   }
   
@@ -198,11 +198,11 @@ function renderEmployeeTable(employees) {
         </td>
         <td><span class="status-badge ${statusBadgeClass}">${statusLabel}</span></td>
         <td>${emp.email || 'N/A'}</td>
-        <td><span class="role-badge ${emp.role}">${emp.role === 'admin' ? '👨‍💼 Admin' : '👤 Employee'}</span></td>
+        <td><span class="role-badge ${emp.role}">${emp.role === 'admin' ? 'Admin' : 'Employee'}</span></td>
         <td>${joinDate}</td>
         <td>
           <div class="action-buttons">
-            <a href="edit-employee.html?id=${emp.id}" class="btn-icon" title="Edit">✏️</a>
+            <a href="edit-employee.html?id=${emp.id}" class="btn-icon" title="Edit"><i class="bi bi-pencil"></i></a>
           </div>
         </td>
       </tr>

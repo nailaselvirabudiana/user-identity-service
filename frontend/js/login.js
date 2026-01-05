@@ -2,7 +2,7 @@ function renderLoginResult(result) {
   if (result.message) {
     return `<div class="error-box">❌ ${result.message}</div>`;
   }
-  return `<div class="success-box"><div class="success-header">✅ Login berhasil! Mengalihkan...</div></div>`;
+  return `<div class="success-box"><div class="success-header">Login berhasil! Mengalihkan...</div></div>`;
 }
 
 document.getElementById("loginForm").addEventListener("submit", async e => {

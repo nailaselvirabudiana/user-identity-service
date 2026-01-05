@@ -112,8 +112,7 @@ function setToken(token) {
 
 function logout() {
   localStorage.removeItem("token");
-  updateNav();
-  setView("login");
+  window.location.href = 'index.html#login';
 }
 
 async function api(path, method = "GET", body = null) {
