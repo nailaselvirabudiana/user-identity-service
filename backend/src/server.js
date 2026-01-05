@@ -1,0 +1,19 @@
+const express = require("express");
+const cors = require("cors");
+const routes = require("./routes/users");
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(cors()); // agar frontend bisa call API
+app.use(express.json());
+
+// health check
+app.get("/health", (req, res) => res.json({ status: "ok" }));
+
+// routes
+app.use("/", routes);
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`User Identity Service running on port ${PORT}`);
+});

@@ -1,0 +1,120 @@
+const API_BASE = "http://localhost:3000";
+
+function parseJwt(token) {
+  if (!token) return null;
+  try {
+    const payload = token.split(".")[1];
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const json = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
+function getSession() {
+  const token = getToken();
+  const claims = parseJwt(token);
+  return { token, claims };
+}
+
+function setView(view) {
+  const views = document.querySelectorAll("[data-view]");
+  views.forEach(v => {
+    const isActive = v.getAttribute("data-view") === view;
+    v.style.display = isActive ? "block" : "none";
+  });
+
+  if (location.hash !== `#${view}`) {
+    location.hash = `#${view}`;
+  }
+}
+
+function updateNav() {
+  const { token, claims } = getSession();
+  const isAuthed = Boolean(token);
+  const isAdmin = claims?.role === "admin";
+
+  document.querySelectorAll("[data-requires-auth]").forEach(el => {
+    el.style.display = isAuthed ? "inline" : "none";
+  });
+  document.querySelectorAll("[data-requires-admin]").forEach(el => {
+    el.style.display = isAuthed && isAdmin ? "inline" : "none";
+  });
+
+  document.querySelectorAll("[data-nav='login']").forEach(el => {
+    el.style.display = isAuthed ? "none" : "inline";
+  });
+}
+
+function bootSpa() {
+  const { token, claims } = getSession();
+
+  const hashView = (location.hash || "").replace("#", "");
+  const initialView = hashView || (token ? "profile" : "login");
+
+  updateNav();
+  setView(initialView);
+
+  if (token && claims?.user_id) {
+    const profileUserId = document.getElementById("profileUserId");
+    const updateUserId = document.getElementById("updateUserId");
+    if (profileUserId && !profileUserId.value) profileUserId.value = claims.user_id;
+    if (updateUserId && !updateUserId.value) updateUserId.value = claims.user_id;
+  }
+}
+
+function getToken() {
+  return localStorage.getItem("token");
+}
+
+function setToken(token) {
+  localStorage.setItem("token", token);
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  updateNav();
+  setView("login");
+}
+
+async function api(path, method = "GET", body = null) {
+  const headers = { "Content-Type": "application/json" };
+  const token = getToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const res = await fetch(API_BASE + path, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : null
+  });
+
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
+}
+
+function requireAuth() {
+  if (!getToken()) {
+    alert("Please login first");
+    updateNav();
+    setView("login");
+    return false;
+  }
+  return true;
+}
+
+window.addEventListener("hashchange", () => {
+  const view = (location.hash || "").replace("#", "");
+  if (view) setView(view);
+});
+
+window.addEventListener("DOMContentLoaded", bootSpa);
