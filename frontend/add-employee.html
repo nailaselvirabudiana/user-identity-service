@@ -84,7 +84,7 @@ if (claims?.role !== 'admin') {
 document.getElementById('addEmployeeForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const resultDiv = document.getElementById('result');
-  resultDiv.innerHTML = '<div class="loading">🔄 Menyimpan data karyawan...</div>';
+  resultDiv.innerHTML = '<div class="loading">Menyimpan data karyawan...</div>';
   
   const data = {
     id: document.getElementById('userId').value,
@@ -98,9 +98,9 @@ document.getElementById('addEmployeeForm').addEventListener('submit', async (e) 
   const result = await api('/users', 'POST', data);
   
   if (result.message) {
-    resultDiv.innerHTML = `<div class="error-box">❌ ${result.message}</div>`;
+    resultDiv.innerHTML = `<div class="error-box">${result.message}</div>`;
   } else {
-    resultDiv.innerHTML = '<div class="success-box">✅ Karyawan berhasil ditambahkan!</div>';
+    resultDiv.innerHTML = '<div class="success-box">Karyawan berhasil ditambahkan!</div>';
     setTimeout(() => {
       window.location.href = 'admin-dashboard.html';
     }, 1500);

@@ -13,7 +13,7 @@ function renderUpdateResult(user, isError = false) {
           <div class="profile-avatar">${user.name ? user.name.charAt(0).toUpperCase() : 'U'}</div>
           <div class="profile-title">
             <h3>${user.name || 'N/A'}</h3>
-            <span class="role-badge ${user.role}">${user.role === 'admin' ? '👨‍💼 Admin HR' : '👤 Karyawan'}</span>
+            <span class="role-badge ${user.role}">${user.role === 'admin' ? 'Admin HR' : 'Karyawan'}</span>
           </div>
         </div>
         <div class="profile-body">

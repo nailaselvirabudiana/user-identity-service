@@ -27,7 +27,32 @@ const employeeSeeds = [
   { id: "U008", name: "Nina Kurnia", email: "nina@company.com" },
   { id: "U009", name: "Fajar Nugroho", email: "fajar@company.com" },
   { id: "U010", name: "Putri Ayu", email: "putri@company.com" },
-  { id: "U011", name: "Rizky Maulana", email: "rizky@company.com" }
+  { id: "U011", name: "Rizky Maulana", email: "rizky@company.com" },
+  { id: "U012", name: "Dian Permata", email: "dian@company.com" },
+  { id: "U013", name: "Hendra Wijaya", email: "hendra@company.com" },
+  { id: "U014", name: "Lina Kusuma", email: "lina@company.com" },
+  { id: "U015", name: "Rudi Hartono", email: "rudi@company.com" },
+  { id: "U016", name: "Maya Sari", email: "maya@company.com" },
+  { id: "U017", name: "Bambang Susilo", email: "bambang@company.com" },
+  { id: "U018", name: "Ratna Dewi", email: "ratna@company.com" },
+  { id: "U019", name: "Yudi Prasetyo", email: "yudi@company.com" },
+  { id: "U020", name: "Ayu Lestari", email: "ayu@company.com" },
+  { id: "U021", name: "Hadi Setiawan", email: "hadi@company.com" },
+  { id: "U022", name: "Indah Permatasari", email: "indah@company.com" },
+  { id: "U023", name: "Wahyu Nugroho", email: "wahyu@company.com" },
+  { id: "U024", name: "Sri Rahayu", email: "sri@company.com" },
+  { id: "U025", name: "Teguh Santoso", email: "teguh@company.com" },
+  { id: "U026", name: "Fitri Handayani", email: "fitri@company.com" },
+  { id: "U027", name: "Dedi Kurniawan", email: "dedi@company.com" },
+  { id: "U028", name: "Mega Pratiwi", email: "mega@company.com" },
+  { id: "U029", name: "Joko Widodo", email: "joko@company.com" },
+  { id: "U030", name: "Eka Wati", email: "eka@company.com" },
+  { id: "U031", name: "Arif Rahman", email: "arif@company.com" },
+  { id: "U032", name: "Sari Puspita", email: "sari@company.com" },
+  { id: "U033", name: "Iwan Setiawan", email: "iwan@company.com" },
+  { id: "U034", name: "Novi Anggraini", email: "novi@company.com" },
+  { id: "U035", name: "Anton Budiman", email: "anton@company.com" },
+  { id: "U036", name: "Lia Maharani", email: "lia@company.com" }
 ];
 
 employeeSeeds.forEach((e) => {

@@ -13,7 +13,7 @@ function renderRegisterResult(user, isError = false) {
           <div class="profile-avatar">${user.name ? user.name.charAt(0).toUpperCase() : 'U'}</div>
           <div class="profile-title">
             <h3>${user.name || 'N/A'}</h3>
-            <span class="role-badge ${user.role}">${user.role === 'admin' ? '👨‍💼 Admin HR' : '👤 Karyawan'}</span>
+            <span class="role-badge ${user.role}">${user.role === 'admin' ? 'Admin HR' : 'Karyawan'}</span>
           </div>
         </div>
         <div class="profile-body">
@@ -51,7 +51,7 @@ document.getElementById("regForm").addEventListener("submit", async e => {
   const roleEl = document.getElementById("regRole");
   const resultDiv = document.getElementById("registerResult");
   
-  resultDiv.innerHTML = '<div class="loading">🔄 Mendaftarkan karyawan...</div>';
+  resultDiv.innerHTML = '<div class="loading">Mendaftarkan karyawan...</div>';
   
   const result = await api("/users", "POST", {
     id: idEl.value,
