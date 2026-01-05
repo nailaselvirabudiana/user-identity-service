@@ -1,11 +1,7 @@
 FROM node:18-bullseye
 
 # Instal build tools untuk memastikan sqlite3 bisa dicompile dengan benar
-RUN apt-get update && apt-get install -y \
-    python3 \
-    make \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
