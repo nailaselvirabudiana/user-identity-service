@@ -2,13 +2,14 @@ version: '3.8'
 
 services:
   app:
-    build: .
+    image: noivira124/tendee-naila
+    container_name: tendee-service
     ports:
       - "3011:3011"
-    env_file:
-      - .env
+    environment:
+      - PORT=3011
+      - JWT_SECRET=tendee-super-secret-jwt-key
     volumes:
-      - .:/app
-      - /app/node_modules
-      - ./database.sqlite:/app/database.sqlite
+      # Menghubungkan file database di root aplikasi ke folder di STB
+      - ~/tendee-data/database.sqlite:/app/database.sqlite
     restart: always
