@@ -33,6 +33,39 @@ function setView(view) {
   if (location.hash !== `#${view}`) {
     location.hash = `#${view}`;
   }
+  
+  // Update dynamic content based on view and role
+  if (view === "update") {
+    const { claims } = getSession();
+    const isAdmin = claims?.role === 'admin';
+    const subtitle = document.getElementById('updateSubtitle');
+    const userIdInput = document.getElementById('updateUserId');
+    
+    if (subtitle && userIdInput) {
+      if (isAdmin) {
+        subtitle.textContent = 'Admin dapat mengupdate profil semua karyawan';
+        userIdInput.removeAttribute('readonly');
+      } else {
+        subtitle.textContent = 'Anda hanya dapat mengupdate profil Anda sendiri';
+        userIdInput.setAttribute('readonly', 'readonly');
+        if (claims?.user_id) {
+          userIdInput.value = claims.user_id;
+        }
+      }
+    }
+  } else if (view === "profile") {
+    const { claims } = getSession();
+    const subtitle = document.getElementById('profileSubtitle');
+    const isAdmin = claims?.role === 'admin';
+    
+    if (subtitle) {
+      if (isAdmin) {
+        subtitle.textContent = 'Admin dapat melihat profil semua karyawan';
+      } else {
+        subtitle.textContent = 'Lihat profil Anda';
+      }
+    }
+  }
 }
 
 function updateNav() {
@@ -110,6 +143,12 @@ function requireAuth() {
     return false;
   }
   return true;
+}
+
+function quickLogin(email, password) {
+  document.getElementById("loginEmail").value = email;
+  document.getElementById("loginPassword").value = password;
+  document.getElementById("loginForm").dispatchEvent(new Event("submit"));
 }
 
 window.addEventListener("hashchange", () => {
