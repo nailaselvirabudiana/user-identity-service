@@ -3,7 +3,7 @@ const cors = require("cors");
 const routes = require("./routes/users");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3011;
 
 app.use(cors()); // agar frontend bisa call API
 app.use(express.json());

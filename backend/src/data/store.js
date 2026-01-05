@@ -74,8 +74,39 @@ const getUserRawByEmail = async (email) => {
 
 const updateUser = async (id, updateData) => {
     const { name, email } = updateData;
-    await db.run('UPDATE users SET name = ?, email = ? WHERE id = ?', [name, email, id]);
-    return getUserById(id);
+    
+    console.log('updateUser called:', { id, updateData, name, email });
+    
+    // Build dynamic UPDATE query only for fields that are provided
+    const updates = [];
+    const values = [];
+    
+    if (name !== undefined) {
+        updates.push('name = ?');
+        values.push(name);
+    }
+    if (email !== undefined) {
+        updates.push('email = ?');
+        values.push(email);
+    }
+    
+    if (updates.length === 0) {
+        console.log('No fields to update');
+        return getUserById(id); // No fields to update
+    }
+    
+    values.push(id); // Add id for WHERE clause
+    const query = `UPDATE users SET ${updates.join(', ')} WHERE id = ?`;
+    
+    console.log('SQL Query:', query);
+    console.log('SQL Values:', values);
+    
+    await db.run(query, values);
+    
+    const result = await getUserById(id);
+    console.log('Updated user:', result);
+    
+    return result;
 };
 
 const updateUserStatus = async (id, status) => {

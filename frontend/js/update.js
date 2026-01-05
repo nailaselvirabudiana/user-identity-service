@@ -46,9 +46,17 @@ document.getElementById("updateForm").addEventListener("submit", async e => {
   const emailEl = document.getElementById("updateEmail");
   const resultDiv = document.getElementById("updateResult");
   
+  console.log('Form submitted!');
+  console.log('User ID:', userIdEl.value);
+  console.log('Name:', nameEl.value);
+  console.log('Email:', emailEl.value);
+  
   // Validate: employee can only update their own profile
   const { claims } = getSession();
   const isAdmin = claims?.role === 'admin';
+  
+  console.log('Is Admin:', isAdmin);
+  console.log('Claims:', claims);
   
   if (!isAdmin && userIdEl.value !== claims?.user_id) {
     resultDiv.innerHTML = '<div class="error-box">❌ Anda hanya dapat mengupdate profil Anda sendiri!</div>';
@@ -59,6 +67,8 @@ document.getElementById("updateForm").addEventListener("submit", async e => {
   if (nameEl.value) body.name = nameEl.value;
   if (emailEl.value) body.email = emailEl.value;
   
+  console.log('Request body:', body);
+  
   if (Object.keys(body).length === 0) {
     resultDiv.innerHTML = '<div class="error-box">❌ Masukkan minimal satu field untuk diupdate (nama atau email)</div>';
     return;
@@ -66,12 +76,20 @@ document.getElementById("updateForm").addEventListener("submit", async e => {
 
   resultDiv.innerHTML = '<div class="loading">🔄 Mengupdate profil...</div>';
 
-  const result = await api(`/users/${userIdEl.value}`, "PATCH", body);
-  resultDiv.innerHTML = renderUpdateResult(result, !!result.message);
+  console.log('Sending PATCH request to:', `/users/${userIdEl.value}`);
   
-  // Clear form if success
-  if (!result.message) {
-    nameEl.value = '';
-    emailEl.value = '';
+  try {
+    const result = await api(`/users/${userIdEl.value}`, "PATCH", body);
+    console.log('API Response:', result);
+    resultDiv.innerHTML = renderUpdateResult(result, !!result.message);
+    
+    // Clear form if success
+    if (!result.message) {
+      nameEl.value = '';
+      emailEl.value = '';
+    }
+  } catch (error) {
+    console.error('API Error:', error);
+    resultDiv.innerHTML = `<div class="error-box">❌ Error: ${error.message}</div>`;
   }
 });

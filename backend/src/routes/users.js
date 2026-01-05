@@ -131,10 +131,10 @@ router.get("/users/:id", auth, async (req, res) => {
 /**
  * USER IDENTITY (Core)
  * Subdomain: Update Profile
- * PUT /users/:id  (admin or self)
+ * PATCH /users/:id  (admin or self)
  * body: { name?, email? }
  */
-router.put("/users/:id", auth, async (req, res) => {
+router.patch("/users/:id", auth, async (req, res) => {
   const targetId = String(req.params.id);
 
   const isAdmin = req.user.role === "admin";
@@ -145,10 +145,20 @@ router.put("/users/:id", auth, async (req, res) => {
   }
 
   try {
+    console.log('UPDATE Request:', {
+      targetId,
+      body: req.body,
+      isAdmin,
+      isSelf
+    });
+    
     const updated = await updateUser(targetId, req.body || {});
+    console.log('UPDATE Result:', updated);
+    
     if (!updated) return res.status(404).json({ message: "User not found" });
     return res.json(updated);
   } catch (e) {
+    console.error('UPDATE Error:', e);
     return res.status(500).json({ message: "Database error", error: e.message });
   }
 });
@@ -175,6 +185,19 @@ router.patch("/users/:id/status", auth, requireRole(["admin"]), async (req, res)
     return res.json(updated);
   } catch (e) {
     return res.status(500).json({ message: "Database error", error: e.message });
+  }
+});
+
+/**
+ * DEBUG - Get user with raw password (REMOVE IN PRODUCTION!)
+ * GET /debug/users/:id
+ */
+router.get("/debug/users/:id", auth, async (req, res) => {
+  try {
+    const user = await getUserRawByEmail((await getUserById(req.params.id))?.email);
+    return res.json(user || { message: "User not found" });
+  } catch (e) {
+    return res.status(500).json({ error: e.message });
   }
 });
 

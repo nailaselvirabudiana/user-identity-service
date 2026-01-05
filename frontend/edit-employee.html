@@ -106,31 +106,60 @@ document.getElementById('editEmployeeForm').addEventListener('submit', async (e)
   e.preventDefault();
   const resultDiv = document.getElementById('result');
   
-  const body = {};
+  console.log('=== EDIT EMPLOYEE FORM SUBMIT ===');
+  
   const name = document.getElementById('name').value;
   const email = document.getElementById('email').value;
   const status = document.getElementById('status').value;
   
-  if (name) body.name = name;
-  if (email) body.email = email;
-  if (status) body.status = status;
+  console.log('Form values:', { name, email, status });
   
-  if (Object.keys(body).length === 0) {
+  // Update profile (name and email)
+  const profileBody = {};
+  if (name) profileBody.name = name;
+  if (email) profileBody.email = email;
+  
+  console.log('Profile body:', profileBody);
+  
+  if (Object.keys(profileBody).length === 0 && !status) {
     resultDiv.innerHTML = '<div class="error-box">❌ Minimal isi satu field untuk update</div>';
     return;
   }
   
   resultDiv.innerHTML = '<div class="loading">🔄 Memperbarui data...</div>';
   
-  const result = await api(`/users/${employeeId}`, 'PUT', body);
-  
-  if (result.message) {
-    resultDiv.innerHTML = `<div class="error-box">❌ ${result.message}</div>`;
-  } else {
+  try {
+    // Update profile if name or email changed
+    if (Object.keys(profileBody).length > 0) {
+      console.log('Updating profile with PATCH...');
+      const profileResult = await api(`/users/${employeeId}`, 'PATCH', profileBody);
+      console.log('Profile update result:', profileResult);
+      
+      if (profileResult.message) {
+        resultDiv.innerHTML = `<div class="error-box">❌ ${profileResult.message}</div>`;
+        return;
+      }
+    }
+    
+    // Update status separately if changed
+    if (status) {
+      console.log('Updating status...');
+      const statusResult = await api(`/users/${employeeId}/status`, 'PATCH', { status });
+      console.log('Status update result:', statusResult);
+      
+      if (statusResult.message) {
+        resultDiv.innerHTML = `<div class="error-box">❌ ${statusResult.message}</div>`;
+        return;
+      }
+    }
+    
     resultDiv.innerHTML = '<div class="success-box">✅ Data berhasil diperbarui!</div>';
     setTimeout(() => {
       window.location.href = 'admin-dashboard.html';
     }, 1500);
+  } catch (error) {
+    console.error('Update error:', error);
+    resultDiv.innerHTML = `<div class="error-box">❌ Error: ${error}</div>`;
   }
 });
 

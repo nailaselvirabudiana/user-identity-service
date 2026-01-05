@@ -1,18 +1,15 @@
-const API_BASE = "http://localhost:3000";
+const API_BASE = "http://localhost:3011";
 
 function parseJwt(token) {
   if (!token) return null;
   try {
     const payload = token.split(".")[1];
     const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
-    const json = decodeURIComponent(
-      atob(base64)
-        .split("")
-        .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join("")
-    );
-    return JSON.parse(json);
-  } catch {
+    // Decode base64 safely without eval-like patterns
+    const jsonPayload = atob(base64);
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    console.error('JWT parse error:', e);
     return null;
   }
 }
