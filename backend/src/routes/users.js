@@ -7,8 +7,8 @@ const {
   getUserById,
   getUserRawByEmail,
   createUser,
-  updateProfile,
-  updateEmployeeStatus
+  updateUser,
+  updateUserStatus
 } = require("../data/store");
 
 const router = express.Router();
@@ -19,30 +19,34 @@ const JWT_SECRET = process.env.JWT_SECRET || "secret123";
  * POST /auth/login
  * body: { email, password }
  */
-router.post("/auth/login", (req, res) => {
+router.post("/auth/login", async (req, res) => {
   const { email, password } = req.body || {};
   if (!email || !password) {
     return res.status(400).json({ message: "email and password required" });
   }
 
-  const user = getUserRawByEmail(String(email));
-  if (!user || user.password !== String(password)) {
-    return res.status(401).json({ message: "Invalid email or password" });
-  }
-  if (user.status !== "active") {
-    return res.status(403).json({ message: "User is not active" });
-  }
+  try {
+    const user = await getUserRawByEmail(String(email));
+    if (!user || user.password !== String(password)) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+    if (user.status !== "active") {
+      return res.status(403).json({ message: "User is not active" });
+    }
 
-  const token = jwt.sign(
-    { user_id: user.id, role: user.role },
-    JWT_SECRET,
-    { expiresIn: "2h" }
-  );
+    const token = jwt.sign(
+      { user_id: user.id, role: user.role },
+      JWT_SECRET,
+      { expiresIn: "2h" }
+    );
 
-  return res.json({
-    token,
-    user: { id: user.id, name: user.name, role: user.role, status: user.status }
-  });
+    return res.json({
+      token,
+      user: { id: user.id, name: user.name, role: user.role, status: user.status }
+    });
+  } catch (e) {
+    return res.status(500).json({ message: "Database error", error: e.message });
+  }
 });
 
 /**
@@ -51,20 +55,20 @@ router.post("/auth/login", (req, res) => {
  * POST /users  (admin only)
  * body: { id, name, email, role, status, password }
  */
-router.post("/users", auth, requireRole(["admin"]), (req, res) => {
+router.post("/users", auth, requireRole(["admin"]), async (req, res) => {
   const { id, name, email, role, status, password } = req.body || {};
   if (!id || !name || !email) {
     return res.status(400).json({ message: "id, name, email are required" });
   }
 
   try {
-    const created = createUser({
+    const created = await createUser({
       id: String(id),
       name: String(name),
       email: String(email),
       role: role ? String(role) : "employee",
       status: status ? String(status) : "active",
-      password: password ? String(password) : "12345"
+      password: password ? String(password) : "user123"
     });
     return res.status(201).json(created);
   } catch (e) {
@@ -77,8 +81,28 @@ router.post("/users", auth, requireRole(["admin"]), (req, res) => {
  * List users (admin only)
  * GET /users
  */
-router.get("/users", auth, requireRole(["admin"]), (req, res) => {
-  return res.json(listUsers());
+router.get("/users", auth, requireRole(["admin"]), async (req, res) => {
+  try {
+    const users = await listUsers();
+    return res.json(users);
+  } catch (e) {
+    return res.status(500).json({ message: "Database error", error: e.message });
+  }
+});
+
+/**
+ * USER IDENTITY (Core)
+ * Get own profile
+ * GET /users/me
+ */
+router.get("/users/me", auth, async (req, res) => {
+  try {
+    const user = await getUserById(req.user.user_id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    return res.json(user);
+  } catch (e) {
+    return res.status(500).json({ message: "Database error", error: e.message });
+  }
 });
 
 /**
@@ -88,25 +112,29 @@ router.get("/users", auth, requireRole(["admin"]), (req, res) => {
  * admin can access anyone
  * employee can access self only
  */
-router.get("/users/:id", auth, (req, res) => {
+router.get("/users/:id", auth, async (req, res) => {
   const targetId = String(req.params.id);
 
   if (req.user.role !== "admin" && req.user.user_id !== targetId) {
     return res.status(403).json({ message: "Employees can only access their own profile" });
   }
 
-  const user = getUserById(targetId);
-  if (!user) return res.status(404).json({ message: "User not found" });
-  return res.json(user);
+  try {
+    const user = await getUserById(targetId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    return res.json(user);
+  } catch (e) {
+    return res.status(500).json({ message: "Database error", error: e.message });
+  }
 });
 
 /**
  * USER IDENTITY (Core)
  * Subdomain: Update Profile
- * PATCH /users/:id  (admin or self)
+ * PUT /users/:id  (admin or self)
  * body: { name?, email? }
  */
-router.patch("/users/:id", auth, (req, res) => {
+router.put("/users/:id", auth, async (req, res) => {
   const targetId = String(req.params.id);
 
   const isAdmin = req.user.role === "admin";
@@ -116,9 +144,13 @@ router.patch("/users/:id", auth, (req, res) => {
     return res.status(403).json({ message: "Forbidden" });
   }
 
-  const updated = updateProfile(targetId, req.body || {});
-  if (!updated) return res.status(404).json({ message: "User not found" });
-  return res.json(updated);
+  try {
+    const updated = await updateUser(targetId, req.body || {});
+    if (!updated) return res.status(404).json({ message: "User not found" });
+    return res.json(updated);
+  } catch (e) {
+    return res.status(500).json({ message: "Database error", error: e.message });
+  }
 });
 
 /**
@@ -127,7 +159,7 @@ router.patch("/users/:id", auth, (req, res) => {
  * PATCH /users/:id/status (admin only)
  * body: { status: "active" | "inactive" | "resigned" }
  */
-router.patch("/users/:id/status", auth, requireRole(["admin"]), (req, res) => {
+router.patch("/users/:id/status", auth, requireRole(["admin"]), async (req, res) => {
   const targetId = String(req.params.id);
   const { status } = req.body || {};
   if (!status) return res.status(400).json({ message: "status required" });
@@ -137,9 +169,13 @@ router.patch("/users/:id/status", auth, requireRole(["admin"]), (req, res) => {
     return res.status(400).json({ message: `status must be one of: ${allowed.join(", ")}` });
   }
 
-  const updated = updateEmployeeStatus(targetId, String(status));
-  if (!updated) return res.status(404).json({ message: "User not found" });
-  return res.json(updated);
+  try {
+    const updated = await updateUserStatus(targetId, String(status));
+    if (!updated) return res.status(404).json({ message: "User not found" });
+    return res.json(updated);
+  } catch (e) {
+    return res.status(500).json({ message: "Database error", error: e.message });
+  }
 });
 
 module.exports = router;

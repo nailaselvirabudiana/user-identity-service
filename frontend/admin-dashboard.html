@@ -58,7 +58,6 @@
           <th>Status</th>
           <th>Email</th>
           <th>Role</th>
-          <th>Join Date</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -179,11 +178,6 @@ function renderEmployeeTable(employees) {
     const initials = emp.name ? emp.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'U';
     const statusBadgeClass = getStatusClass(emp.status);
     const statusLabel = getStatusLabel(emp.status);
-    const joinDate = emp.createdAt ? new Date(emp.createdAt).toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    }) : '-';
     
     return `
       <tr>
@@ -199,7 +193,6 @@ function renderEmployeeTable(employees) {
         <td><span class="status-badge ${statusBadgeClass}">${statusLabel}</span></td>
         <td>${emp.email || 'N/A'}</td>
         <td><span class="role-badge ${emp.role}">${emp.role === 'admin' ? 'Admin' : 'Employee'}</span></td>
-        <td>${joinDate}</td>
         <td>
           <div class="action-buttons">
             <a href="edit-employee.html?id=${emp.id}" class="btn-icon" title="Edit"><i class="bi bi-pencil"></i></a>
